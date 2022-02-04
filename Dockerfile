@@ -1,14 +1,18 @@
-FROM python:3.8
+FROM python:3.8.3-alpine
 
-WORKDIR /code
+RUN pip install --upgrade pip
 
-COPY requirements.txt .
+RUN adduser -D bio
+USER bio
+WORKDIR /home/bio/
 
-# install dependencies
-RUN pip install -r requirements.txt
+ENV PATH="/home/bio/.local/bin:${PATH}"
 
-# copy the content of the local src directory to the working directory
-COPY src/ .
+COPY --chown=bio:bio requirements.txt requirements.txt
+RUN pip install --user -r requirements.txt
 
-# command to run on container start
-CMD [ "python", "./server.py" ]
+COPY --chown=bio:bio src/main.py src/
+COPY --chown=bio:bio src/api_control.py src/
+COPY --chown=bio:bio src/menu_control.py src/
+
+CMD ["python3", "src/main.py"]

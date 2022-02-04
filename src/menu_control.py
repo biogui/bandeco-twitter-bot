@@ -1,6 +1,10 @@
+import pytz
+import logging
 import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
+
+LOGGER = logging.getLogger()
 
 DAYS_RELATION = [
     'Domingo',
@@ -12,24 +16,26 @@ DAYS_RELATION = [
     'Sábado'
 ]
 
-PERIODS_RELATION = [
-    'Almoço',
-    'Jantar'
-]
+PERIODS_RELATION = {
+    'AM': 'Almoço',
+    'PM': 'Jantar'
+}
 
 class Meal:
     def __init__(self, title, content):
         self.title   = title
 
         self.base    = content[0]
-        self.garnish = content[4]
+        self.garnish = content[-2]
 
         not_veggie   = content[2]
         veggie       = content[3].split(": ")[-1]
-        self.main    = f'{not_veggie} ou {veggie}'
+        if len(content) > 6:
+            veggie += f' {content[4]}'
 
+        self.main    = f'{not_veggie} ou {veggie}'
         self.salad   = content[1].split(': ')[-1]
-        self.dessert = content[5].split(': ')[-1]
+        self.dessert = content[-1].split(': ')[-1]
 
     def __str__(self):
         meal_data = [
@@ -43,7 +49,7 @@ class Meal:
 
         return '\n'.join(meal_data)
 
-class Scraper:
+class MenuScraper:
     menu_url = 'http://www.puspsc.usp.br/cardapio/'
 
     def __init__(self):
@@ -67,16 +73,27 @@ class Scraper:
             day_lunch  = element[1].get_text().split('\n')
             day_dinner = element[2].get_text().split('\n')
 
-            menu_data[week_day] = [day_lunch, day_dinner]
+            menu_data[week_day] = {
+                'AM': day_lunch,
+                'PM': day_dinner
+            }
 
         self.current_menu = menu_data
 
-    def update_current_meal(self, day, period):
+    def update_current_meal(self, date=None, period=None):
         self.__upadate_menu_data()
 
-        day = DAYS_RELATION[day]
+        if date:
+            weekday = date[0]
+            period  = date[1]
+        else:
+            curr_date = datetime.now(pytz.timezone('America/Sao_Paulo'))
+            weekday = curr_date.weekday()
+            period  = curr_date.strftime('%p')
+
+        day = DAYS_RELATION[weekday]
 
         content = self.current_menu[day][period]
         title = f'{PERIODS_RELATION[period]} {day}'
 
-        self.current_meal(title, content)
+        self.current_meal = Meal(title, content)
