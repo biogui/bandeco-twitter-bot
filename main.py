@@ -1,5 +1,4 @@
 import os
-import src.env as env
 from src.apis_control import GIPHY_Control, Twitter_Control
 from src.menu_control import Menu
 
