@@ -48,14 +48,17 @@ class Meal:
             self.dessert = None
 
     def __str__(self):
-        meal_data = [f'{self.title}\n', self.base]
+        meal_data = [f'{self.title}\n']
         if self:
             meal_data += [
-                f'Guarnição: {self.garnish}',
-                f'Prato principal: {self.main}',
-                f'Salada: {self.salad}',
-                f'Sobremesa: {self.dessert}'
+                f'· {self.base}',
+                f'· Guarnição: {self.garnish}',
+                f'· Principal: {self.main}',
+                f'· Salada: {self.salad}',
+                f'· Sobremesa: {self.dessert}'
             ]
+        else:
+            meal_data += [self.base]
 
         return '\n'.join(meal_data)
 
