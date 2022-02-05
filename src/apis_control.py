@@ -33,10 +33,10 @@ class GIPHY_Control:
 
     def download_random_gif(self, searched_tag, download_path):
         r = self.api.gifs_search_get(
-            self.api_key, searched_tag,
-            offset=random.randint(1, 50), fmt='gif'
+            self.api_key, searched_tag, limit=1,
+            offset=random.randint(1, 100), fmt='gif'
         )
-        gif = random.choice(r.data)
+        gif = r.data[0]
         gif_url = gif.images.downsized.url
 
         content = requests.get(gif_url).content
