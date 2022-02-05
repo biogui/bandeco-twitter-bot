@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from src.apis_control import GIPHY_Control, Twitter_Control
 from src.menu_control import Menu
 
@@ -27,6 +28,6 @@ def main():
     os.remove(GIF_PATH)
 
 if __name__ == '__main__':
-    print('Bot is running...')
+    print(f'Bot is running [{datetime.now()}]...')
     main()
     print('Bot shut down!')
