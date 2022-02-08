@@ -5,6 +5,9 @@ from bs4 import BeautifulSoup
 
 USP_URL      = 'http://www.puspsc.usp.br/cardapio/'
 CLOSED_ALERT = 'Bandeco fechado ...'
+CHANGE_ALERT = '(este cardápio poderá ser alterado sem aviso prévio)'
+
+DEFAULT_CONTENT_LEN = 7
 
 DAYS_RELATION = [
     'Segunda-feira',
@@ -28,24 +31,26 @@ class Meal:
             self.gif_tag = 'food'
 
             self.base    = content[0]
-            self.garnish = content[-2]
+            self.garnish = content[-3]
 
             not_veggie = content[2]
             veggie     = content[3].split(": ")[-1]
-            if len(content) > 6:
+            if len(content) > DEFAULT_CONTENT_LEN:
                 veggie += f' {content[4]}'
 
-            self.main    = f'{not_veggie} ou {veggie}'
-            self.salad   = content[1].split(': ')[-1]
-            self.dessert = content[-1].split(': ')[-1]
+            self.main       = f'{not_veggie} ou {veggie}'
+            self.salad      = content[1].split(': ')[-1]
+            self.dessert    = content[-2].split(': ')[-1]
+            self.additional = content[-1]
         else:
             self.gif_tag = 'no'
 
-            self.base    = CLOSED_ALERT
-            self.garnish = None
-            self.main    = None
-            self.salad   = None
-            self.dessert = None
+            self.base       = CLOSED_ALERT
+            self.garnish    = None
+            self.main       = None
+            self.salad      = None
+            self.dessert    = None
+            self.additional = None
 
     def __str__(self):
         meal_data = [f'{self.title}\n']
@@ -55,7 +60,8 @@ class Meal:
                 f'· Guarnição: {self.garnish}',
                 f'· Principal: {self.main}',
                 f'· Salada: {self.salad}',
-                f'· Sobremesa: {self.dessert}'
+                f'· Sobremesa: {self.dessert}',
+                f'· Adicionais: {self.additional}'
             ]
         else:
             meal_data += [self.base]
@@ -67,11 +73,9 @@ class Meal:
 
 class Menu:
     def __init__(self):
-        self.url = USP_URL
-        self.current_menu     = None
-        self.current_meal     = None
-        # self.current_week     = None
-        # self.current_schedule = None
+        self.url          = USP_URL
+        self.current_menu = None
+        self.current_meal = None
 
     def __scrape_menu_data(self):
         r    = requests.get(self.url)
