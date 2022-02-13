@@ -25,12 +25,11 @@ PERIODS_RELATION = {
 
 class Meal:
     def __init__(self, title, content):
-        self.title   = title
+        self.title = title
+        self.base  = content[0]
 
-        if content[0]:
+        if self.base != CLOSED_ALERT:
             self.gif_tag = 'food'
-
-            self.base    = content[0]
             self.garnish = content[-3]
 
             not_veggie = content[2]
@@ -43,9 +42,7 @@ class Meal:
             self.dessert    = content[-2].split(': ')[-1]
             self.additional = content[-1]
         else:
-            self.gif_tag = 'no'
-
-            self.base       = CLOSED_ALERT
+            self.gif_tag    = 'no'
             self.garnish    = None
             self.main       = None
             self.salad      = None
@@ -113,7 +110,13 @@ class Menu:
 
         day = DAYS_RELATION[weekday]
 
-        content = self.current_menu[day][period]
+        content = list()
+        if day in self.current_menu:
+            content = self.current_menu[day][period]
+
+        if not content or not content[0]:
+            content = [CLOSED_ALERT]
+
         title = f'{PERIODS_RELATION[period]} {day}'
 
         self.current_meal = Meal(title, content)

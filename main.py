@@ -22,9 +22,10 @@ def main():
     menu   = Menu()
 
     menu.update_current_meal()
+    print(menu.current_meal)
+
     giphy.download_random_gif(menu.current_meal.gif_tag, GIF_PATH)
 
-    print(menu.current_meal)
     tt_bot.post_tweet(menu.current_meal, GIF_PATH)
     os.remove(GIF_PATH)
 
