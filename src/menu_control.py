@@ -23,6 +23,13 @@ PERIODS_RELATION = {
     'PM': 'Jantar'
 }
 
+def get_index_containing_substring(strings, substring):
+    for idx, s in enumerate(strings):
+        if substring in s:
+            return idx
+
+    return None
+
 class Meal:
     def __init__(self, title, content):
         self.title = title
@@ -30,17 +37,30 @@ class Meal:
 
         if self.base != CLOSED_ALERT:
             self.gif_tag = 'food'
-            self.garnish = content[-3]
+            self.salad   = content[1].split(': ')[-1]
+
+            dessert_idx = get_index_containing_substring(
+                content, 'Sobremesa:'
+            )
+            veggie_idx     = 3
+            garnish_idx    = dessert_idx - 1
+            additional_idx = len(content) - 1
+
+            self.garnish = content[garnish_idx]
 
             not_veggie = content[2]
-            veggie     = content[3].split(": ")[-1]
-            if len(content) > DEFAULT_CONTENT_LEN:
-                veggie += f' {content[4]}'
+            veggie     = content[veggie_idx].split(": ")[-1]
+            if garnish_idx - veggie_idx > 1:
+                extra_content = ' '.join(content[veggie_idx + 1:garnish_idx])
+                veggie += f' {extra_content}'
+            self.main    = f'{not_veggie} ou {veggie}'
 
-            self.main       = f'{not_veggie} ou {veggie}'
-            self.salad      = content[1].split(': ')[-1]
-            self.dessert    = content[-2].split(': ')[-1]
-            self.additional = content[-1]
+            self.dessert = content[dessert_idx].split(': ')[-1]
+            if additional_idx - dessert_idx > 1:
+                extra_content = ' '.join(content[dessert_idx + 1:additional_idx])
+                self.dessert += f' {extra_content}'
+
+            self.additional = content[additional_idx]
         else:
             self.gif_tag    = 'no'
             self.garnish    = None
@@ -53,12 +73,12 @@ class Meal:
         meal_data = [f'{self.title}\n']
         if self:
             meal_data += [
-                f'· {self.base}',
-                f'· Guarnição: {self.garnish}',
-                f'· Principal: {self.main}',
-                f'· Salada: {self.salad}',
-                f'· Sobremesa: {self.dessert}',
-                f'· Adicionais: {self.additional}'
+                f'🍚 {self.base}',
+                f'🍛 Guarnição: {self.garnish}',
+                f'🍳 Principal: {self.main}\n',
+                f'🥗 Salada: {self.salad}',
+                f'🍫 Sobremesa: {self.dessert}',
+                f'🥤 Adicionais: {self.additional}'
             ]
         else:
             meal_data += [self.base]
