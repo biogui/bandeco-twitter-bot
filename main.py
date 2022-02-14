@@ -22,7 +22,9 @@ def main():
     menu   = Menu()
 
     menu.update_current_meal()
+    print('-' * 50)
     print(menu.current_meal)
+    print('-' * 50)
 
     giphy.download_random_gif(menu.current_meal.gif_tag, GIF_PATH)
 
