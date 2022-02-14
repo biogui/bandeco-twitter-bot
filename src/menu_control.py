@@ -78,7 +78,7 @@ class Meal:
                 f'🍳 Principal: {self.main}\n',
                 f'🥗 Salada: {self.salad}',
                 f'🍫 Sobremesa: {self.dessert}',
-                f'🥤 Adicionais: {self.additional}'
+                f'🥖 Adicionais: {self.additional}'
             ]
         else:
             meal_data += [self.base]
