@@ -7,8 +7,6 @@ USP_URL      = 'http://www.puspsc.usp.br/cardapio/'
 CLOSED_ALERT = 'Bandeco fechado ...'
 CHANGE_ALERT = '(este cardápio poderá ser alterado sem aviso prévio)'
 
-DEFAULT_CONTENT_LEN = 7
-
 DAYS_RELATION = [
     'Segunda-feira',
     'Terça-feira',
@@ -42,9 +40,9 @@ class Meal:
             dessert_idx = get_index_containing_substring(
                 content, 'Sobremesa:'
             )
-            veggie_idx     = 3
-            garnish_idx    = dessert_idx - 1
-            additional_idx = len(content) - 1
+            veggie_idx  = 3
+            garnish_idx = dessert_idx - 1
+            last_idx    = len(content) - 1
 
             self.garnish = content[garnish_idx]
 
@@ -53,32 +51,34 @@ class Meal:
             if garnish_idx - veggie_idx > 1:
                 extra_content = ' '.join(content[veggie_idx + 1:garnish_idx])
                 veggie += f' {extra_content}'
-            self.main    = f'{not_veggie} ou {veggie}'
+            self.main   = f'{not_veggie} ou {veggie}'
+
+            has_additional = ('pão' in content[last_idx])
 
             self.dessert = content[dessert_idx].split(': ')[-1]
-            if additional_idx - dessert_idx > 1:
-                extra_content = ' '.join(content[dessert_idx + 1:additional_idx])
-                self.dessert += f' {extra_content}'
+            if last_idx != dessert_idx:
+                if has_additional:
+                    extra_content = ' '.join(content[dessert_idx + 1:last_idx])
+                else:
+                    extra_content = ' '.join(content[dessert_idx + 1:last_idx + 1])
 
-            self.additional = content[additional_idx]
+                self.dessert += f' {extra_content}'
         else:
             self.gif_tag    = 'no'
             self.garnish    = None
             self.main       = None
             self.salad      = None
             self.dessert    = None
-            self.additional = None
 
     def __str__(self):
         meal_data = [f'{self.title}\n']
         if self:
             meal_data += [
-                f'🍚 {self.base}',
+                f'🍚 {self.base}\n',
                 f'🍛 Guarnição: {self.garnish}',
                 f'🍳 Principal: {self.main}\n',
                 f'🥗 Salada: {self.salad}',
-                f'🍫 Sobremesa: {self.dessert}',
-                f'🥖 Adicionais: {self.additional}'
+                f'🍫 Sobremesa: {self.dessert}'
             ]
         else:
             meal_data += [self.base]
